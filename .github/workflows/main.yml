@@ -1,0 +1,298 @@
+from flask import Flask, request, render_template_string  
+import your_algorithm_module  
+  
+app = Flask(__name__)  
+  
+# Simple form to input length and width  
+form_html = """  
+<!DOCTYPE html>  
+<html>  
+  <body>  
+   <h2>Rectangle Properties Calculator</h2>  
+   <form action="" method="post">  
+    <label for="length">Length:</label><br>  
+    <input type="text" id="length" name="length" required><br>  
+    <label for="width">Width:</label><br>  
+    <input type="text" id="width" name="width" required><br>  
+    <input type="submit" value="Calculate">  
+   </form>  
+   {% if result %}  
+    <p>Result: {{ result }}</p>  
+   {% endif %}  
+  </body>  
+</html>  
+"""  
+  
+@app.route('/', methods=['GET', 'POST'])  
+def index():  
+   if request.method == 'POST':  
+      length = float(request.form['length'])  
+      width = float(request.form['width'])  
+      area, perimeter = your_algorithm_module.calculate_rectangle_properties(length, width)  
+      result = f"Area: {area}, Perimeter: {perimeter}"  
+      return render_template_string(form_html, result=result)  
+   return render_template_string(form_html)  
+  
+if __name__ == '__main__':  
+   app.run(debug=True)
+import tkinter as tk  
+  
+def calculate_rectangle_properties(length, width):  
+   area = length * width  
+   perimeter = 2 * (length + width)  
+   return area, perimeter  
+  
+def calculate_and_display():  
+   try:  
+      length = float(length_entry.get())  
+      width = float(width_entry.get())  
+      area, perimeter = calculate_rectangle_properties(length, width)  
+      result_label.config(text=f"Area: {area}, Perimeter: {perimeter}")  
+   except ValueError:  
+      result_label.config(text="Please enter valid numbers.")  
+  
+root = tk.Tk()  
+root.title("Rectangle Properties Calculator")  
+  
+length_label = tk.Label(root, text="Length:")  
+length_label.pack()  
+length_entry = tk.Entry(root)  
+length_entry.pack()  
+  
+width_label = tk.Label(root, text="Width:")  
+width_label.pack()  
+width_entry = tk.Entry(root)  
+width_entry.pack()  
+  
+calculate_button = tk.Button(root, text="Calculate", command=calculate_and_display)  
+calculate_button.pack()  
+  
+result_label = tk.Label(root, text="")  
+result_label.pack()  
+  
+root.mainloop()
+def calculate_rectangle_properties(length, width):  
+   area = length * width  
+   perimeter = 2 * (length + width)  
+   return area, perimeter  
+  
+# Example usage  
+length = 5  
+width = 3  
+area, perimeter = calculate_rectangle_properties(length, width)  
+print(f"For a rectangle with length {length} and width {width}:")  
+print(f"Area: {area}")  
+print(f"Perimeter: {perimeter}")
+import pandas as pd  
+from sklearn.decomposition import NMF  
+from sklearn.neighbors import NearestNeighbors  
+from sklearn.metrics.pairwise import cosine_similarity  
+from annoy import AnnoyIndex  
+from sentiment_analysis import analyze_sentiment  
+  
+def load_ratings_data(file_path: str) -> pd.DataFrame:  
+   # ...  
+  
+def normalize_ratings(ratings_data: pd.DataFrame) -> pd.DataFrame:  
+   # ...  
+  
+def factorize_matrix(ratings_data: pd.DataFrame, num_components: int) -> pd.DataFrame:  
+   # ...  
+  
+def build_annoy_index(customer_embeddings: pd.DataFrame) -> AnnoyIndex:  
+   # ...  
+  
+def generate_recommendations(customer_id: int, num_recommendations: int, customer_embeddings: pd.DataFrame, annoy_index: AnnoyIndex, ratings_data: pd.DataFrame) -> list:  
+   # ...  
+  
+def integrate_sentiment_analysis(customer_embeddings: pd.DataFrame, sentiment_scores: pd.DataFrame) -> pd.DataFrame:  
+   # Integrate sentiment scores into customer embeddings  
+   customer_embeddings['sentiment'] = sentiment_scores  
+   return customer_embeddings  
+  
+def update_matrix_factorization(customer_embeddings: pd.DataFrame, num_components: int) -> pd.DataFrame:  
+   # Update matrix factorization to incorporate sentiment feature  
+   nmf = NMF(n_components=num_components, random_state=42)  
+   customer_embeddings = nmf.fit_transform(customer_embeddings)  
+   return customer_embeddings  
+  
+def update_annoy_index(customer_embeddings: pd.DataFrame) -> AnnoyIndex:  
+   # Update Annoy index to include sentiment feature  
+   t = AnnoyIndex(customer_embeddings.shape[1], 'angular')  
+   for i, v in enumerate(customer_embeddings):  
+      t.add_item(i, v)  
+   t.build(10)  
+   return t  
+  
+def update_recommendation_generation(customer_id: int, num_recommendations: int, customer_embeddings: pd.DataFrame, annoy_index: AnnoyIndex, ratings_data: pd.DataFrame) -> list:  
+   # Update recommendation generation to take into account sentiment scores  
+   customer_vector = customer_embeddings[customer_id]  
+   nearest_neighbors = annoy_index.get_nns_by_vector(customer_vector, num_recommendations, search_k=-1, include_distances=False)  
+   recommended_products = []  
+   for neighbor in nearest_neighbors:  
+      recommended_products.extend(ratings_data.loc[neighbor, 'ProductID'].tolist())  
+   return recommended_products  
+  
+def main():  
+   file_path = 'large_dataset.csv'  
+   ratings_data = load_ratings_data(file_path)  
+   if ratings_data is None:  
+      return  
+  
+   ratings_data = normalize_ratings(ratings_data)  
+   customer_embeddings = factorize_matrix(ratings_data, 5)  
+   if customer_embeddings is None:  
+      return  
+  
+   sentiment_scores = analyze_sentiment(ratings_data)  
+   customer_embeddings = integrate_sentiment_analysis(customer_embeddings, sentiment_scores)  
+   customer_embeddings = update_matrix_factorization(customer_embeddings, 5)  
+   annoy_index = update_annoy_index(customer_embeddings)  
+  
+   customer_ids = [1, 2, 3, 4, 5]  
+   num_recommendations = 3  
+   recommendations = [update_recommendation_generation(customer_id, num_recommendations, customer_embeddings, annoy_index, ratings_data) for customer_id in customer_ids]  
+  
+   for customer_id, recommendation in zip(customer_ids, recommendations):  
+      print(f"Recommendations for customer {customer_id}: {recommendation}")  
+  
+if __name__ == "__main__":  
+   main()
+import pandas as pd  
+from sklearn.decomposition import NMF  
+from sklearn.neighbors import NearestNeighbors  
+from sklearn.metrics.pairwise import cosine_similarity  
+from joblib import Parallel, delayed  
+from annoy import AnnoyIndex  
+  
+def load_data(file_path: str) -> pd.DataFrame:  
+   try:  
+      data = pd.read_csv(file_path)  
+      return data  
+   except Exception as e:  
+      print(f"Error loading data: {e}")  
+      return None  
+  
+def normalize_ratings(data: pd.DataFrame) -> pd.DataFrame:  
+   data['Rating'] = data['Rating'] / data['Rating'].max()  
+   return data  
+  
+def apply_matrix_factorization(data: pd.DataFrame, num_components: int) -> pd.DataFrame:  
+   try:  
+      nmf = NMF(n_components=num_components, random_state=42)  
+      customer_features = nmf.fit_transform(data.pivot(index='CustomerID', columns='ProductID', values='Rating'))  
+      return customer_features  
+   except Exception as e:  
+      print(f"Error applying matrix factorization: {e}")  
+      return None  
+  
+def build_annoy_index(customer_features: pd.DataFrame) -> AnnoyIndex:  
+   try:  
+      t = AnnoyIndex(customer_features.shape[1], 'angular')  
+      for i, v in enumerate(customer_features):  
+        t.add_item(i, v)  
+      t.build(10)  
+      return t  
+   except Exception as e:  
+      print(f"Error building Annoy index: {e}")  
+      return None  
+  
+def get_recommendations(customer_id: int, num_recommendations: int, customer_features: pd.DataFrame, annoy_index: AnnoyIndex, data: pd.DataFrame) -> list:  
+   try:  
+      customer_vector = customer_features[customer_id]  
+      nearest_neighbors = annoy_index.get_nns_by_vector(customer_vector, num_recommendations, search_k=-1, include_distances=False)  
+      recommended_products = []  
+      for neighbor in nearest_neighbors:  
+        recommended_products.extend(data.loc[neighbor, 'ProductID'].tolist())  
+      return recommended_products  
+   except Exception as e:  
+      print(f"Error getting recommendations: {e}")  
+      return []  
+  
+def main():  
+   file_path = 'large_dataset.csv'  
+   data = load_data(file_path)  
+   if data is None:  
+      return  
+  
+   data = normalize_ratings(data)  
+   customer_features = apply_matrix_factorization(data, 5)  
+   if customer_features is None:  
+      return  
+  
+   annoy_index = build_annoy_index(customer_features)  
+   if annoy_index is None:  
+      return  
+  
+   customer_ids = [1, 2, 3, 4, 5]  
+   num_recommendations = 3  
+   recommendations = Parallel(n_jobs=-1)(delayed(get_recommendations)(customer_id, num_recommendations, customer_features, annoy_index, data) for customer_id in customer_ids)  
+  
+   for customer_id, recommendation in zip(customer_ids, recommendations):  
+      print(f"Recommendations for customer {customer_id}: {recommendation}")  
+  
+if __name__ == "__main__":  
+   main()
+import pandas as pd  
+from sklearn.decomposition import NMF  
+from sklearn.neighbors import NearestNeighbors  
+from sklearn.metrics.pairwise import cosine_similarity  
+from joblib import Parallel, delayed  
+  
+# Load data  
+data = pd.read_csv('large_dataset.csv')  
+  
+# Normalize ratings  
+data['Rating'] = data['Rating'] / data['Rating'].max()  
+  
+# Apply matrix factorization  
+nmf = NMF(n_components=5, random_state=42)  
+customer_features = nmf.fit_transform(data.pivot(index='CustomerID', columns='ProductID', values='Rating'))  
+  
+# Use approximate nearest neighbors search  
+from annoy import AnnoyIndex  
+t = AnnoyIndex(customer_features.shape[1], 'angular')  
+for i, v in enumerate(customer_features):  
+   t.add_item(i, v)  
+t.build(10)  
+  
+# Define a function to get recommendations  
+def get_recommendations(customer_id, num_recommendations):  
+   # Get the customer's feature vector  
+   customer_vector = customer_features[customer_id]  
+    
+   # Get the nearest neighbors  
+   nearest_neighbors = t.get_nns_by_vector(customer_vector, num_recommendations, search_k=-1, include_distances=False)  
+    
+   # Get the recommended products  
+   recommended_products = []  
+   for neighbor in nearest_neighbors:  
+      recommended_products.extend(data.loc[neighbor, 'ProductID'].tolist())  
+    
+   return recommended_products  
+  
+# Use parallel processing to get recommendations for multiple customers  
+customer_ids = [1, 2, 3, 4, 5]  
+num_recommendations = 3  
+recommendations = Parallel(n_jobs=-1)(delayed(get_recommendations)(customer_id, num_recommendations) for customer_id in customer_ids)
+probability = 0.5  # probability of the coin landing heads up  
+variables = []  # no variables to consider  
+weights = []  # no weights to assign  
+  
+odds = calculate_odds(probability, variables, weights)  
+print(f"The odds of the coin landing heads up are {odds:.2f}:1")
+import pandas as pd  
+from sklearn.decomposition import NMF  
+from sklearn.neighbors import NearestNeighbors  
+from sklearn.metrics.pairwise import cosine_similarity  
+from joblib import Parallel, delayed  
+  
+# Load data  
+data = pd.read_csv('large_dataset.csv')  
+  
+# Normalize ratings  
+data['Rating'] = data['Rating'] / data['Rating'].max()  
+  
+# Apply matrix factorization  
+nmf = NMF(n_components=5, random_state=42)  
+customer_features = nmf.fit_transform(data.pivot(index='
